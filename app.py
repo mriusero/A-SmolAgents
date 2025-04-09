@@ -2,6 +2,7 @@ from smolagents import CodeAgent,DuckDuckGoSearchTool, HfApiModel,load_tool,tool
 import os 
 import datetime
 import requests
+import urllib.parse
 import pytz
 import yaml
 from tools.final_answer import FinalAnswerTool
@@ -20,6 +21,28 @@ def my_custom_tool(arg1:str, arg2:int)-> str: #it's import to specify the return
         arg2: the second argument
     """
     return "What magic will you build ?"
+
+@tool
+def calculator(operation: str, expression: str) -> str:
+    """
+    A tool that performs advanced mathematical operations using the Newton API.
+    Args:
+        operation: The mathematical operation to perform (e.g., 'derive', 'integrate').
+        expression: The mathematical expression to operate on.
+    Returns:
+        The result of the mathematical operation as a string.
+    """
+    encoded_expression = urllib.parse.quote(expression)
+    url = f"https://newton.now.sh/api/v2/{operation}/{encoded_expression}"
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        result = response.json().get("result")
+        return result
+    else:
+        return f"Error: Unable to fetch result. Status code: {response.status_code}"
+
 
 @tool
 def get_current_time_in_timezone(timezone: str) -> str:
@@ -61,7 +84,13 @@ with open("prompts.yaml", 'r') as stream:
     
 agent = CodeAgent(
     model=model,
-    tools=[final_answer, web_search, visit_webpage, get_current_time_in_timezone], ## add your tools here (don't remove final answer)
+    tools=[
+        final_answer,
+        web_search,
+        visit_webpage,
+        get_current_time_in_timezone,
+        calculator,
+    ], ## add your tools here (don't remove final answer)
     max_steps=6,
     verbosity_level=1,
     grammar=None,
