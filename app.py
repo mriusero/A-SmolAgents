@@ -5,9 +5,12 @@ import requests
 import urllib.parse
 import pytz
 import yaml
+
 from tools.final_answer import FinalAnswerTool
 from tools.web_search import DuckDuckGoSearchTool
 from tools.visit_webpage import VisitWebpageTool
+from tools.get_timezone import get_current_time_in_timezone
+from tools.calculate import calculator
 
 from Gradio_UI import GradioUI
 
@@ -21,44 +24,6 @@ def my_custom_tool(arg1:str, arg2:int)-> str: #it's import to specify the return
         arg2: the second argument
     """
     return "What magic will you build ?"
-
-@tool
-def calculator(operation: str, expression: str) -> str:
-    """
-    A tool that performs advanced mathematical operations using the Newton API.
-    Args:
-        operation: The mathematical operation to perform (e.g., 'derive', 'integrate').
-        expression: The mathematical expression to operate on.
-    Returns:
-        The result of the mathematical operation as a string.
-    """
-    encoded_expression = urllib.parse.quote(expression)
-    url = f"https://newton.now.sh/api/v2/{operation}/{encoded_expression}"
-
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        result = response.json().get("result")
-        return result
-    else:
-        return f"Error: Unable to fetch result. Status code: {response.status_code}"
-
-
-@tool
-def get_current_time_in_timezone(timezone: str) -> str:
-    """A tool that fetches the current local time in a specified timezone.
-    Args:
-        timezone: A string representing a valid timezone (e.g., 'America/New_York').
-    """
-    try:
-        # Create timezone object
-        tz = pytz.timezone(timezone)
-        # Get current time in that timezone
-        local_time = datetime.datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
-        return f"The current local time in {timezone} is: {local_time}"
-    except Exception as e:
-        return f"Error fetching time for timezone '{timezone}': {str(e)}"
-
 
 final_answer = FinalAnswerTool()
 web_search = DuckDuckGoSearchTool()
