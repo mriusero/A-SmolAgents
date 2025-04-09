@@ -238,10 +238,10 @@ class GradioUI:
 
         with gr.Blocks(fill_height=True) as demo:
             gr.Markdown("""
-            # SmolAgents Gradio UI
+            # SmolAgents
 
-            The current Agent is based on the model Qwen2.5-Coder-32B-Instruct.
-            The purpose is to show how an agent can interact with different tools to enhance its capacities.
+            The current Agent is based on the model Qwen2.5-Coder-32B-Instruct.  
+            The purpose is to show how an LLM interacting with different tools can enhance its capacities.
 
             #### Available Tools
             - **Web Search**: Perform a web search using DuckDuckGo.
@@ -300,6 +300,13 @@ class GradioUI:
                 
                 What is the capital of baguettes 🥖 and what time is it there?
 
+            ### Analyze GitHub Repository 
+            
+                Can you please analyze this repository and give me an explanation of it :\n
+                https://github.com/mriusero/defi-user-behavior-clustering ?
+                
+                Feel free to give a ⭐️ if you like it 😜!
+
             ### Ask for doc explanation
             
                 Can you please explain me this documentation :\n
@@ -312,11 +319,6 @@ class GradioUI:
                 Can you please also factorise this polynomial :\n
                 x^3 - 6x^2 + 11x - 6 ?
 
-            ### Analyze GitHub Repository 
-            
-                Can you please analyze the statistics of this repository and explain to me what its purpose is:\n
-                https://github.com/mriusero/defi-user-behavior-clustering ?
-                Feel free to star it if you like it 😜!
             """)
 
         demo.launch(debug=True, share=True, **kwargs)
