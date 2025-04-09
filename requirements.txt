@@ -2,4 +2,4 @@ markdownify
 requests
 duckduckgo_search
 pandas
-smolagents[gradio]
+pydantic==2.10.6
