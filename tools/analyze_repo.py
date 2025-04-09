@@ -1,16 +1,14 @@
 from typing import Any, Dict
 import requests
+from smolagents.tools import Tool
 
-class GitHubCodeQualityTool:
+class GitHubCodeQualityTool(Tool):
     name = "github_code_quality"
     description = "Analyzes the code quality of a public GitHub repository."
     inputs = {
         'github_url': {'type': 'string', 'description': 'The URL of the public GitHub repository to analyze.'}
     }
     output_type = "dict"
-
-    def __init__(self):
-        pass
 
     def forward(self, github_url: str) -> Dict[str, Any]:
         """
@@ -58,3 +56,6 @@ class GitHubCodeQualityTool:
     def extract_repo_info(self, github_url: str) -> str:
         """Extracts repository information from the GitHub URL."""
         return "/".join(github_url.split("/")[-2:])
+
+    def __init__(self, *args, **kwargs):
+        self.is_initialized = False
