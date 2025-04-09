@@ -2,9 +2,9 @@ from typing import Any, Dict
 import requests
 from smolagents.tools import Tool
 
-class GitHubCodeQualityTool(Tool):
-    name = "github_code_quality"
-    description = "Analyzes the code quality of a public GitHub repository."
+class GitHubAnalyzerTool(Tool):
+    name = "analyze_github_repository"
+    description = "Analyzes statistics such as issues, pull_requests, contributors, stars and forks of a public GitHub repository and return a synthesis in markdown string with the results."
     inputs = {
         'github_url': {'type': 'string', 'description': 'The URL of the public GitHub repository to analyze.'}
     }
@@ -15,13 +15,11 @@ class GitHubCodeQualityTool(Tool):
 
     def forward(self, github_url: str) -> str:
         """
-        Analyzes the code quality of a public GitHub repository.
-
+        Analyzes statistics such as issues, pull_requests, contributors, stars and forks of a public GitHub repository and return a synthesis in markdown string with the results.
         Args:
             github_url: The URL of the public GitHub repository to analyze.
-
         Returns:
-            A string containing the code quality analysis results in Markdown format.
+            A synthesis of repository statistics in markdown string with the results.
         """
         if not self.validate_github_url(github_url):
             return "Please provide a valid GitHub repository URL."

@@ -11,7 +11,7 @@ from tools.web_search import DuckDuckGoSearchTool
 from tools.visit_webpage import VisitWebpageTool
 from tools.get_timezone import get_current_time_in_timezone
 from tools.calculate import calculator
-from tools.analyze_repo import GitHubCodeQualityTool
+from tools.analyze_repo import GitHubAnalyzerTool
 
 from Gradio_UI import GradioUI
 
@@ -29,7 +29,7 @@ def my_custom_tool(arg1:str, arg2:int)-> str: #it's import to specify the return
 final_answer = FinalAnswerTool()
 web_search = DuckDuckGoSearchTool()
 visit_webpage = VisitWebpageTool()
-analyze_code_quality = GitHubCodeQualityTool()
+analyze_github_repository = GitHubAnalyzerTool()
 
 # If the agent does not answer, the model is overloaded, please use another model or the following Hugging Face Endpoint that also contains qwen2.5 coder:
 # model_id='https://pflgm2locj2t89co.us-east-1.aws.endpoints.huggingface.cloud' 
@@ -57,7 +57,7 @@ agent = CodeAgent(
         visit_webpage,
         get_current_time_in_timezone,
         calculator,
-        analyze_code_quality,
+        analyze_github_repository,
     ], ## add your tools here (don't remove final answer)
     max_steps=6,
     verbosity_level=1,
