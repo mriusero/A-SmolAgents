@@ -1,18 +1,3 @@
-#!/usr/bin/env python
-# coding=utf-8
-# Copyright 2024 The HuggingFace Inc. team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 import mimetypes
 import os
 import re
@@ -23,7 +8,6 @@ from smolagents.agent_types import AgentAudio, AgentImage, AgentText, handle_age
 from smolagents.agents import ActionStep, MultiStepAgent
 from smolagents.memory import MemoryStep
 from smolagents.utils import _is_package_available
-
 
 def pull_messages_from_step(
     step_log: MemoryStep,
@@ -122,7 +106,6 @@ def pull_messages_from_step(
         yield gr.ChatMessage(role="assistant", content=f"{step_footnote}")
         yield gr.ChatMessage(role="assistant", content="-----")
 
-
 def stream_to_gradio(
     agent,
     task: str,
@@ -153,27 +136,16 @@ def stream_to_gradio(
         ):
             yield message
 
-    final_answer = step_log  # Last log is the run's final_answer
+    final_answer = step_log
     final_answer = handle_agent_output_types(final_answer)
 
-    if isinstance(final_answer, AgentText):
-        yield gr.ChatMessage(
-            role="assistant",
-            content=f"**Final answer:**\n{final_answer.to_string()}\n",
-        )
-    elif isinstance(final_answer, AgentImage):
-        yield gr.ChatMessage(
-            role="assistant",
-            content={"path": final_answer.to_string(), "mime_type": "image/png"},
-        )
-    elif isinstance(final_answer, AgentAudio):
-        yield gr.ChatMessage(
-            role="assistant",
-            content={"path": final_answer.to_string(), "mime_type": "audio/wav"},
-        )
-    else:
-        yield gr.ChatMessage(role="assistant", content=f"**Final answer:** {str(final_answer)}")
+    final_answer_str = getattr(final_answer, 'final_answer', '')
 
+    final_answer_str = f"\n{final_answer_str}\n"
+
+    yield gr.ChatMessage(role="assistant", content=final_answer_str)
+
+    return final_answer_str
 
 class GradioUI:
     """A one-line interface to launch your agent in Gradio"""
@@ -189,15 +161,18 @@ class GradioUI:
             if not os.path.exists(file_upload_folder):
                 os.mkdir(file_upload_folder)
 
-    def interact_with_agent(self, prompt, messages):
+    def interact_with_agent(self, prompt, messages, final_answer_state):
         import gradio as gr
 
         messages.append(gr.ChatMessage(role="user", content=prompt))
-        yield messages
+        yield messages, final_answer_state
         for msg in stream_to_gradio(self.agent, task=prompt, reset_agent_memory=False):
             messages.append(msg)
-            yield messages
-        yield messages
+            yield messages, final_answer_state
+
+        # Update final answer state
+        final_answer_state = msg.content if isinstance(msg, gr.ChatMessage) else ""
+        yield messages, final_answer_state
 
     def upload_file(
         self,
@@ -262,35 +237,86 @@ class GradioUI:
         import gradio as gr
 
         with gr.Blocks(fill_height=True) as demo:
-            stored_messages = gr.State([])
-            file_uploads_log = gr.State([])
-            chatbot = gr.Chatbot(
-                label="Agent",
-                type="messages",
-                avatar_images=(
-                    None,
-                    "https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/communication/Alfred.png",
-                ),
-                resizeable=True,
-                scale=1,
-            )
-            # If an upload folder is provided, enable the upload feature
-            if self.file_upload_folder is not None:
-                upload_file = gr.File(label="Upload a file")
-                upload_status = gr.Textbox(label="Upload Status", interactive=False, visible=False)
-                upload_file.change(
-                    self.upload_file,
-                    [upload_file, file_uploads_log],
-                    [upload_status, file_uploads_log],
-                )
-            text_input = gr.Textbox(lines=1, label="Chat Message")
-            text_input.submit(
-                self.log_user_message,
-                [text_input, file_uploads_log],
-                [stored_messages, text_input],
-            ).then(self.interact_with_agent, [stored_messages, chatbot], [chatbot])
+            gr.Markdown("""
+            # SmolAgents Gradio UI
+
+            The current Agent is based on the model Qwen2.5-Coder-32B-Instruct.
+            The purpose is to show how an agent can interact with different tools to enhance its capacities.
+
+            #### Available Tools
+            - **Web Search**: Perform a web search using DuckDuckGo.
+            - **Visit Webpage**: Visit a webpage and read its content.
+            - **Get Current Time**: Get the current time in a specified timezone.
+            - **Calculator**: Perform calculations such as simplification, factorisation, integration [see API](https://github.com/aunyks/newton-api).
+            - **Analyze GitHub Repository**: Analyze a GitHub repository and provide insights.
+
+            \n\n
+
+            """)
+
+            with gr.Row():
+                with gr.Column():
+                    stored_messages = gr.State([])
+                    file_uploads_log = gr.State([])
+                    final_answer_state = gr.State("")
+                    chatbot = gr.Chatbot(
+                        label="Agent",
+                        type="messages",
+                        avatar_images=(
+                            None,
+                            "https://huggingface.co/datasets/agents-course/course-images/resolve/main/en/communication/Alfred.png",
+                        ),
+                        resizeable=True,
+                        scale=1,
+                    )
+                    if self.file_upload_folder is not None:
+                        upload_file = gr.File(label="Upload a file")
+                        upload_status = gr.Textbox(label="Upload Status", interactive=False, visible=False)
+                        upload_file.change(
+                            self.upload_file,
+                            [upload_file, file_uploads_log],
+                            [upload_status, file_uploads_log],
+                        )
+                    text_input = gr.Textbox(lines=1, label="Chat Message")
+                    text_input.submit(
+                        self.log_user_message,
+                        [text_input, file_uploads_log],
+                        [stored_messages, text_input],
+                    ).then(self.interact_with_agent, [stored_messages, chatbot, final_answer_state],
+                           [chatbot, final_answer_state])
+
+                with gr.Column():
+                    final_answer_display = gr.Markdown("## Final Answer")
+                    final_answer_state.change(
+                        lambda state: f"## Final Answer\n\n{state}",
+                        inputs=final_answer_state,
+                        outputs=final_answer_display,
+                    )
+
+            gr.Markdown("""
+            # Example Usage
+
+            ### Question Asking
+                
+                What is the capital of baguettes 🥖 and what time is it there?
+
+            ### Ask for doc explanation
+            
+                Can you please explain me this documentation :\n
+                https://datashader.org/user_guide/Networks.html ?
+
+            ### Mathematics Calculation
+                        
+                What is the integral of sin(x) dx?
+                
+                Can you please also factorise this polynomial :\n
+                x^3 - 6x^2 + 11x - 6 ?
+
+            ### Analyze GitHub Repository 
+            
+                Can you please analyze the statistics of this repository and explain to me what its purpose is:\n
+                https://github.com/mriusero/defi-user-behavior-clustering ?
+                Feel free to star it if you like it 😜!
+            """)
 
         demo.launch(debug=True, share=True, **kwargs)
-
-
-__all__ = ["stream_to_gradio", "GradioUI"]
