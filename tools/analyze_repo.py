@@ -8,12 +8,12 @@ class GitHubCodeQualityTool(Tool):
     inputs = {
         'github_url': {'type': 'string', 'description': 'The URL of the public GitHub repository to analyze.'}
     }
-    output_type = "dict"
+    output_type = "string"
 
     def __init__(self):
         pass
 
-    def forward(self, github_url: str) -> Dict[str, Any]:
+    def forward(self, github_url: str) -> str:
         """
         Analyzes the code quality of a public GitHub repository.
 
@@ -21,7 +21,7 @@ class GitHubCodeQualityTool(Tool):
             github_url: The URL of the public GitHub repository to analyze.
 
         Returns:
-            A dictionary containing the code quality analysis results.
+            A string containing the code quality analysis results in Markdown format.
         """
         metrics = {
             "complexity": "Calculate the average cyclomatic complexity of functions",
@@ -31,7 +31,12 @@ class GitHubCodeQualityTool(Tool):
             "last_commit": self.fetch_last_commit_date(github_url),
         }
 
-        return metrics
+        # Format the metrics as a Markdown string
+        markdown_output = "\n".join([
+            f"- **{key}**: {value}" for key, value in metrics.items()
+        ])
+
+        return markdown_output
 
     def fetch_open_issues(self, github_url: str) -> int:
         """Retrieves the number of open issues for a GitHub repository."""
