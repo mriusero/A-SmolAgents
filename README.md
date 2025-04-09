@@ -1,13 +1,14 @@
 ---
-title: First Agent Template
+title: GitHub Explorer Agent
 emoji: ⚡
-colorFrom: pink
-colorTo: yellow
+colorFrom: blue
+colorTo: indigo
 sdk: gradio
 sdk_version: 5.23.3
 python_version: 3.12
 app_file: app.py
 pinned: false
+short_description: A SmolAgent that analyzes GitHub repositories, performs web searches, and more.
 tags:
 - smolagents
 - agent
