@@ -10,6 +10,9 @@ class GitHubCodeQualityTool(Tool):
     }
     output_type = "dict"
 
+    def __init__(self):
+        pass
+
     def forward(self, github_url: str) -> Dict[str, Any]:
         """
         Analyzes the code quality of a public GitHub repository.
@@ -56,6 +59,3 @@ class GitHubCodeQualityTool(Tool):
     def extract_repo_info(self, github_url: str) -> str:
         """Extracts repository information from the GitHub URL."""
         return "/".join(github_url.split("/")[-2:])
-
-    def __init__(self, *args, **kwargs):
-        self.is_initialized = False
