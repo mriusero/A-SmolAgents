@@ -10,8 +10,8 @@ class GitHubCodeQualityTool(Tool):
     }
     output_type = "string"
 
-    def __init__(self):
-        pass
+    def __init__(self, *args, **kwargs):
+        self.is_initialized = False
 
     def forward(self, github_url: str) -> str:
         """
