@@ -3,3 +3,5 @@ smolagents
 requests
 duckduckgo_search
 pandas
+smolagents[gradio]
+gradio==5.24.0
