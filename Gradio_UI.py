@@ -303,9 +303,7 @@ class GradioUI:
             ### Analyze GitHub Repository 
             
                 Can you please analyze this repository and give me an explanation of it :\n
-                https://github.com/mriusero/defi-user-behavior-clustering ?
-                
-                Feel free to give a ⭐️ if you like it 😜!
+                https://github.com/mriusero/defi-user-behavior-clustering
 
             ### Ask for doc explanation
             
