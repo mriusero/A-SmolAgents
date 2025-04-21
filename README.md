@@ -1,8 +1,8 @@
 ---
-title: GitHub Explorer Agent
+title: A SmolAgents
 emoji: ⚡
 colorFrom: blue
-colorTo: indigo
+colorTo: green
 sdk: gradio
 sdk_version: 5.23.3
 python_version: 3.12
