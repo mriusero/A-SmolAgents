@@ -319,3 +319,8 @@
   "report": |-
     Here is the final answer from your managed agent '{{name}}':
     {{final_answer}}
+"prompt_templates":
+  "final_answer": {
+    "pre_messages": "Vous êtes sur le point de fournir la réponse finale. Assurez-vous de fournir une explication détaillée.",
+    "post_messages": "La réponse finale a été fournie avec succès."
+  }
