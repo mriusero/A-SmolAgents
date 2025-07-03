@@ -1,4 +1,4 @@
-from smolagents import CodeAgent,DuckDuckGoSearchTool, ApiModel,load_tool,tool
+from smolagents import CodeAgent,DuckDuckGoSearchTool, ApiModel, load_tool, tool
 import os 
 import datetime
 import requests
@@ -34,7 +34,7 @@ analyze_github_repository = GitHubAnalyzerTool()
 # If the agent does not answer, the model is overloaded, please use another model or the following Hugging Face Endpoint that also contains qwen2.5 coder:
 # model_id='https://pflgm2locj2t89co.us-east-1.aws.endpoints.huggingface.cloud' 
 
-model = HfApiModel(
+model = ApiModel(
 max_tokens=2096,
 temperature=0.5,
 model_id='Qwen/Qwen2.5-Coder-32B-Instruct',# it is possible that this model may be overloaded
