@@ -1,4 +1,4 @@
-from smolagents import CodeAgent,DuckDuckGoSearchTool, HfApiModel,load_tool,tool
+from smolagents import CodeAgent,DuckDuckGoSearchTool, ApiModel,load_tool,tool
 import os 
 import datetime
 import requests
